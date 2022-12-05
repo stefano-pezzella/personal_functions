@@ -1,0 +1,58 @@
+#Help call
+Help()
+{
+   # Display Help
+   echo "Pulls a single subdirectory from a chosen Git repository."
+   echo
+   echo "Syntax: /path/to/gitsubclone.sh [-h|u|s|n|t]"
+   echo "options:"
+   echo "h     Print this Help."
+   echo "u     Repository URL (from GitHub)."
+   echo "s     Subdirectory to pull."
+   echo "n     Name of the local folder to generate. Must not already exist."
+   echo "t     Test option (specific to download from the Odoo 15 repo). Don't need to specify -u when you use this."
+   echo
+}
+
+#Arguments parsing
+if [ $# -eq 0 ]; then
+    echo "No arguments provided"
+    exit 1
+fi
+
+
+while getopts ':hu:s:n:t' opt ; do
+    case $opt in
+        h) Help; exit;;
+        u) url=$OPTARG ;; 
+        s) subdir=$OPTARG ;; 
+        n) dirname=$OPTARG ;;
+        t) url='https://github.com/PacktPublishing/Odoo-15-Development-Essentials'; is_odoo=1  ;;
+    esac 
+done
+
+#Check if target local directory exists. If it does, halt the script and show help.
+old_dir=$(pwd)
+if [ -d "$dirname" ];
+then
+    echo "The directory already exists!"
+    exit 1
+fi
+
+git init $dirname && cd $dirname
+git remote add -f origin $url
+git config core.sparseCheckout true
+echo $subdir >> .git/info/sparse-checkout
+git pull origin master
+
+
+#If -t was used (for the odoo guidebook), prepare the folder in a suitable way 
+if [ is_odoo ];
+then
+    for file in $subdir/$dirname/*; do mv $file .; done; rm -r $subdir
+fi
+
+#Return to original directory
+cd $old_dir
+
+
