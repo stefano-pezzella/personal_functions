@@ -1,0 +1,32 @@
+#!/bin/bash
+#Help call
+Help()
+{
+   # Display Help
+   echo "Runs odoo in background and updates the vcrsa module. Config file is hardcoded for the vcrsa testing environment."
+   echo
+   echo "Syntax: odooq [-h|k]"
+   echo "options:"
+   echo "h     Print this Help."
+   echo "k     Kill a running odoo process."
+}
+
+#Default
+
+
+#Arguments parsing
+while getopts ':hk' opt ; do
+    case $opt in
+        h) Help; exit;;
+        k) killswitch=true;;
+    esac 
+done
+
+#Run or kill odoo
+if [ $killswitch ]; then
+    pkill odoo
+    echo "Odoo process terminated!"
+else
+    odoo -c ~/work_vcr/work_vcr.conf -u vcrsa &
+    echo "Odoo process started! PID: $!"
+fi
