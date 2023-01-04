@@ -24,7 +24,7 @@ done
 
 #Run or kill odoo
 if [ $killswitch ]; then
-    pkill odoo
+    pkill -9 odoo
     echo "Odoo process terminated!"
 else
     odoo -c ~/work_vcr/work_vcr.conf -u vcrsa &
